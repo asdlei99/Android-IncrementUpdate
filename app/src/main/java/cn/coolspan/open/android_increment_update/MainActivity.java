@@ -2,6 +2,7 @@ package cn.coolspan.open.android_increment_update;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -9,6 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -27,6 +29,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Handler handler = new Handler();
 
     private Button button;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         this.button = (Button) this.findViewById(R.id.button);
         this.button.setOnClickListener(this);
+
+        this.textView = (TextView) this.findViewById(R.id.textView);
+
+        try {
+            this.textView.setText("我的版本是" + (this.getPackageManager().getPackageInfo("cn.coolspan.open.android_increment_update", 0).versionName));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         Toast.makeText(this, "新的安装包", Toast.LENGTH_SHORT).show();
 
