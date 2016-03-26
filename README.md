@@ -13,17 +13,18 @@
 用一个旧的Apk安装与一个新的Apk安装包使用 bsdiff工具 ，执行命令生成一个差异文件，此差异文件就是我们修改需要更新下载的那部分。
 
 引入代码及so文件
+==
 
-首先，根据你的系统的架构选择不同的so文件放到你的工程中
+首先，根据你的[系统的架构选择不同的so文件](https://github.com/coolspan/Android-Increment-Update/tree/master/so)放到你的工程中
 
-接着，需要把加载so文件的Java类引入到你的工程中，引入时，需注意，不能修改这个类的包名。
+接着，[需要把加载so文件的Java类引入到你的工程中](https://github.com/coolspan/Android-Increment-Update/tree/master/app/src/main/java/cn/coolspan/open/IncrementUpdateLibs)，引入时，需注意，不能修改这个类的包名。
 
 到此，增量更新引入完成。
 
 使用
 ==
 
-下载bsdiff工具，然后执行命令：bsdiff，会显示出命令提示
+[下载bsdiff工具](http://download.csdn.net/detail/qxs965266509/9473251)，然后执行命令：bsdiff，会显示出命令提示
 
 然后，执行正确的命令，结果如下：
 
