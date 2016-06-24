@@ -1,12 +1,16 @@
 package cn.coolspan.open.android_increment_update;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +35,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Button button;
     private TextView textView;
 
+    IIncrementUpdateServer mService;
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            // TODO Auto-generated method stub
+            Log.e("ServiceConnection", "disconnect service");
+            mService = null;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // TODO Auto-generated method stub
+            Log.e("ServiceConnection", "connect service");
+            mService = IIncrementUpdateServer.Stub.asInterface(service);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +70,28 @@ public class MainActivity extends Activity implements View.OnClickListener {
             e.printStackTrace();
         }
 
-        Toast.makeText(this, "新的安装包", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "新的安装包", Toast.LENGTH_SHORT).show();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Bundle args = new Bundle();
+        Intent intent = new Intent("cn.coolspan.IncrementUpdateService");
+        intent.putExtras(args);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unbindService(mServiceConnection);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
     }
 
     @Override
@@ -81,6 +124,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                                     Toast.makeText(MainActivity.this, "无补丁文件", Toast.LENGTH_SHORT).show();
                                 }
                             });
+//                            Intent intent = new Intent(MainActivity.this, IIncrementUpdateService.class);
+//                            intent.putExtra("ckey", "cvalue");
+//                            startService(intent);
+                            mService.start();
+                            mService.startMergePatch("----------------------url");
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
