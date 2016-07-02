@@ -13,5 +13,7 @@ interface IIncrementUpdateServer {
 
     void start();
 
-    void startMergePatch(String patchFilePath);
+    void reload();
+
+    void stop();
 }

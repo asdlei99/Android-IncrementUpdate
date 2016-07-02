@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +25,8 @@ import cn.coolspan.open.IncrementUpdateLibs.IncrementUpdateUtil;
 
 
 /**
+ * 当前考虑使用跨进程实现Apk的增量更新
+ * <p/>
  * Coolspan on 2016/3/26 11:57
  *
  * @author 乔晓松 coolspan@sina.cn
@@ -51,6 +55,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             // TODO Auto-generated method stub
             Log.e("ServiceConnection", "connect service");
             mService = IIncrementUpdateServer.Stub.asInterface(service);
+            try {
+                if (mService != null)
+                    mService.start();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
     };
 
@@ -65,7 +75,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         this.textView = (TextView) this.findViewById(R.id.textView);
 
         try {
-            this.textView.setText("我的版本是" + (this.getPackageManager().getPackageInfo("cn.coolspan.open.android_increment_update", 0).versionName));
+            this.textView.setText("猜猜我是谁，我的版本是" + (this.getPackageManager().getPackageInfo("cn.coolspan.open.android_increment_update", 0).versionName));
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -79,6 +89,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onResume();
         Bundle args = new Bundle();
         Intent intent = new Intent("cn.coolspan.IncrementUpdateService");
+        //测试出现在高版本的系统会出现异常：Service Intent must be explicit
+        //解决方式：就是指定Intent package
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            intent.setPackage("cn.coolspan.open.android_increment_update");
+        }
         intent.putExtras(args);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -128,7 +143,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 //                            intent.putExtra("ckey", "cvalue");
 //                            startService(intent);
                             mService.start();
-                            mService.startMergePatch("----------------------url");
+//                            mService.startMergePatch("----------------------url");
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
